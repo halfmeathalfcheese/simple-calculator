@@ -8,21 +8,10 @@ let equalsPressed = false;
 const numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'point'];
 const operators = ['plus', 'minus', 'times', 'divide']
 
-function add(a, b) {
-    return Number(a) + Number(b);
-}
-
-function subtract(a, b) {
-    return a - b;
-}
-
-function multiply(a, b) {
-    return a * b;
-}
-
-function divide(a, b) {
-    return a / b;
-}
+const add = (a, b) => Number(a) + Number(b);
+const subtract = (a, b) => a - b;
+const multiply = (a, b) => a * b;
+const divide = (a, b) => a / b;
 
 function operate(num1, num2, operator) {
     switch(operator) {
@@ -44,8 +33,10 @@ function resetCalculator() {
     num1 = '';
     operator = '';
     hasOperatorPressed = false;
-}
-
+    equalsPressed = false;
+    updateDisplay('');
+  }
+  
 function updateDisplay(text, operator=false) {
     const display = document.querySelector('.display');
     if (operator) {
@@ -62,22 +53,13 @@ function handleButtonPress(e) {
     if (operators.includes(buttonId) && hasOperatorPressed) {
         alert('ERROR! Can\'t place 2 operators in a row.');
         resetCalculator();
-        return;
     }
     
-    if (equalsPressed && !operators.includes(buttonId)) {
-        resetCalculator();
-        equalsPressed = false;
-    }
+    if (equalsPressed && !operators.includes(buttonId)) resetCalculator();
     
     if (numbers.includes(buttonId)) {
-        if (buttonId === 'point') {
-            if (num1 === '') {
-                num1 = '0.';
-            } else if (num1.includes('.')) {
-                return;
-            }
-            num1 += '.';
+        if (buttonId === 'point' && !num1.includes('.')) {
+            num1 = num1 === '' ? '0.' : num1 + '.';
         } else {
             num1 += buttonId;
         }
@@ -107,38 +89,27 @@ function handleButtonPress(e) {
     
 }
 
+function keyboardInputHandler(e) {
+    const keyMap = {
+        '+': 'plus',
+        '-': 'minus',
+        '*': 'times',
+        '/': 'divide',
+        Enter: 'equal',
+        '.': 'point',
+    };
+  
+    const buttonId = keyMap[e.key] || e.key;
+    const button = document.getElementById(buttonId);
+    if (button) {
+        button.click();
+    }
+}
+  
 const buttons = document.querySelectorAll('.button');
 buttons.forEach(button => {
     button.addEventListener('click', handleButtonPress);
 })
-
-document.addEventListener('keydown', function (event) {
-    const key = event.key;
-    let buttonId = key === '.' ? 'point' : key;
-
-    switch (key) {
-        case '+':
-            buttonId = 'plus';
-            break;
-        case '-':
-            buttonId = 'minus';
-            break;
-        case '*':
-            buttonId = 'times';
-            break;
-        case '/':
-            buttonId = 'divide';
-            break;
-        case 'Enter':
-            buttonId = 'equal'
-            break;
-        default:
-            break;
-    }
-
-    const button = document.getElementById(buttonId);
-
-    if (button) {
-        button.click();
-    }
-});
+const reset = document.querySelector('.reset');
+reset.addEventListener('click', resetCalculator);
+document.addEventListener('keydown', keyboardInputHandler);
