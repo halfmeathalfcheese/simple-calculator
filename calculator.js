@@ -21,7 +21,12 @@ function operate(num1, num2, operator) {
             return subtract(num1, num2);
         case '*':
             return multiply(num1, num2);
-        case '/': 
+        case '/':
+            if (num2 === 0) {
+                alert(`Can't divide a number by 0!`);
+                resetCalculator();
+                return;
+            }
             return Number(divide(num1, num2).toFixed(5));
         default:
             alert('No such operator');
@@ -47,6 +52,16 @@ function updateDisplay(text, operator=false) {
     display.textContent = text;
 }
 
+function animateButton(buttonId) {
+    const button = document.getElementById(buttonId);
+
+    button.classList.add('button-clicked');
+
+    setTimeout(() => {
+        button.classList.remove('button-clicked');
+    }, 200);
+}
+
 function handleButtonPress(e) {
     const buttonId = e.target.id;
 
@@ -54,7 +69,11 @@ function handleButtonPress(e) {
         alert('ERROR! Can\'t place 2 operators in a row.');
         resetCalculator();
     }
-    
+
+    if (num1.length == 7 && !operators.includes(buttonId)) return;
+
+    animateButton(buttonId);
+
     if (equalsPressed && !operators.includes(buttonId)) resetCalculator();
     
     if (numbers.includes(buttonId)) {
